@@ -1,0 +1,104 @@
+// Prisma schema del CRM Empresarial
+// Por defecto usa SQLite para que la demo corra sin infraestructura extra.
+// Para producción con Postgres: cambiar provider a "postgresql" y DATABASE_URL
+// a algo tipo postgresql://user:pass@localhost:5432/crm
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  VENTAS
+  SOPORTE
+}
+
+enum DealStage {
+  PROSPECTO
+  CONTACTADO
+  PROPUESTA
+  CERRADO_GANADO
+  CERRADO_PERDIDO
+}
+
+enum TaskStatus {
+  PENDIENTE
+  EN_PROGRESO
+  COMPLETADA
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role
+  createdAt     DateTime  @default(now())
+
+  meetings      Meeting[] @relation("MeetingOwner")
+  tasks         Task[]    @relation("TaskOwner")
+  activities    Activity[]
+}
+
+model Client {
+  id            Int       @id @default(autoincrement())
+  name          String
+  company       String?
+  email         String?
+  phone         String?
+  segment       String    @default("Nuevo") // Nuevo, VIP, En riesgo
+  createdAt     DateTime  @default(now())
+
+  deals         Deal[]
+  meetings      Meeting[]
+  activities    Activity[]
+}
+
+model Deal {
+  id            Int       @id @default(autoincrement())
+  title         String
+  value         Float     @default(0)
+  stage         DealStage @default(PROSPECTO)
+  clientId      Int
+  client        Client    @relation(fields: [clientId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Meeting {
+  id            Int       @id @default(autoincrement())
+  date          String    // YYYY-MM-DD
+  time          String    // HH:mm
+  note          String?
+  clientId      Int
+  client        Client    @relation(fields: [clientId], references: [id])
+  ownerId       Int?
+  owner         User?     @relation("MeetingOwner", fields: [ownerId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Task {
+  id            Int        @id @default(autoincrement())
+  title         String
+  dueDate       String?
+  status        TaskStatus @default(PENDIENTE)
+  ownerId       Int?
+  owner         User?      @relation("TaskOwner", fields: [ownerId], references: [id])
+  createdAt     DateTime   @default(now())
+}
+
+model Activity {
+  id            Int       @id @default(autoincrement())
+  type          String    // llamada, email, reunion, nota
+  note          String
+  clientId      Int
+  client        Client    @relation(fields: [clientId], references: [id])
+  userId        Int?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+}
