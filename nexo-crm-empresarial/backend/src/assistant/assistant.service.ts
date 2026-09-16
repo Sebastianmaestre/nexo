@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 
-const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-5';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 @Injectable()
 export class AssistantService {
@@ -19,7 +19,7 @@ export class AssistantService {
   }
 
   async chat(message: string, history: { role: string; content: string }[] = []) {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return { reply: 'Tyron no está conectado todavía (falta la API key en el servidor).' };
     }
@@ -27,18 +27,20 @@ export class AssistantService {
     const context = await this.buildContext();
     const systemPrompt = `Sos Tyron, el asistente de Nexo CRM (una plataforma empresarial de IRIS). Ayudás al equipo a entender sus datos de ventas y a redactar mensajes (emails, notas de seguimiento). Respondé siempre en español, de forma breve y directa. ${context}`;
 
-    const res = await fetch(CLAUDE_API_URL, {
+    const contents = [
+      ...history.map((h) => ({
+        role: h.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: h.content }],
+      })),
+      { role: 'user', parts: [{ text: message }] },
+    ];
+
+    const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 500,
-        system: systemPrompt,
-        messages: [...history, { role: 'user', content: message }],
+        contents,
+        systemInstruction: { parts: [{ text: systemPrompt }] },
       }),
     });
 
@@ -48,7 +50,7 @@ export class AssistantService {
     }
 
     const data: any = await res.json();
-    const textBlock = data.content?.find((c: any) => c.type === 'text');
-    return { reply: textBlock?.text || 'No pude generar una respuesta.' };
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    return { reply: text || 'No pude generar una respuesta.' };
   }
 }
