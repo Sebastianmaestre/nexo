@@ -55,7 +55,11 @@ export const api = {
     updateStatus: (id: number, status: string) => request(`/tasks/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
     remove: (id: number) => request(`/tasks/${id}`, { method: 'DELETE' }),
   },
-
+  assistant: {
+    chat: (message: string, history: { role: string; content: string }[]) =>
+      request('/assistant/chat', { method: 'POST', body: JSON.stringify({ message, history }) }),
+  },
+  
   dashboard: {
     summary: () => request('/dashboard/summary'),
   },

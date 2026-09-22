@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from './Sidebar';
+import TyronWidget from './TyronWidget';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -16,8 +17,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar />
+            <Sidebar />
       <main style={{ flex: 1, padding: '40px 48px', maxWidth: 1100 }}>{children}</main>
+      <TyronWidget />
     </div>
   );
 }
