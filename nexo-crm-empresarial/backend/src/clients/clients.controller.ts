@@ -2,11 +2,16 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, Re
 import { ClientsService } from './clients.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { EventsGateway } from '../realtime/events.gateway';
+import { AuditService } from '../audit/audit.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('clients')
 export class ClientsController {
-  constructor(private service: ClientsService, private events: EventsGateway) {}
+  constructor(
+    private service: ClientsService,
+    private events: EventsGateway,
+    private audit: AuditService,
+  ) {}
 
   @Get()
   findAll(@Query('search') search?: string) {
@@ -19,20 +24,25 @@ export class ClientsController {
   }
 
   @Post()
-  async create(@Body() body: any) {
+  async create(@Body() body: any, @Req() req: any) {
     const client = await this.service.create(body);
     this.events.emitEvent('client:created', client);
+    this.audit.log({ action: 'CREATE', entity: 'Client', entityId: client.id, detail: client.name, userId: req.user?.sub, userName: req.user?.name });
     return client;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: any) {
-    return this.service.update(+id, body);
+  async update(@Param('id') id: string, @Body() body: any, @Req() req: any) {
+    const client = await this.service.update(+id, body);
+    this.audit.log({ action: 'UPDATE', entity: 'Client', entityId: client.id, detail: client.name, userId: req.user?.sub, userName: req.user?.name });
+    return client;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.service.remove(+id);
+  async remove(@Param('id') id: string, @Req() req: any) {
+    const client = await this.service.remove(+id);
+    this.audit.log({ action: 'DELETE', entity: 'Client', entityId: +id, detail: client.name, userId: req.user?.sub, userName: req.user?.name });
+    return client;
   }
 
   @Post(':id/activities')
