@@ -1,7 +1,5 @@
 // Prisma schema del CRM Empresarial
-// Por defecto usa SQLite para que la demo corra sin infraestructura extra.
-// Para producción con Postgres: cambiar provider a "postgresql" y DATABASE_URL
-// a algo tipo postgresql://user:pass@localhost:5432/crm
+// Provider: PostgreSQL (producción)
 
 generator client {
   provider = "prisma-client-js"
@@ -72,8 +70,8 @@ model Deal {
 
 model Meeting {
   id            Int       @id @default(autoincrement())
-  date          String    // YYYY-MM-DD
-  time          String    // HH:mm
+  date          String
+  time          String
   note          String?
   clientId      Int
   client        Client    @relation(fields: [clientId], references: [id])
@@ -94,11 +92,22 @@ model Task {
 
 model Activity {
   id            Int       @id @default(autoincrement())
-  type          String    // llamada, email, reunion, nota
+  type          String
   note          String
   clientId      Int
   client        Client    @relation(fields: [clientId], references: [id])
   userId        Int?
   user          User?     @relation(fields: [userId], references: [id])
   createdAt     DateTime  @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  entity    String
+  entityId  Int
+  detail    String?
+  userId    Int?
+  userName  String?
+  createdAt DateTime @default(now())
 }
