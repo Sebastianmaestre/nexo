@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import LiveToaster from '@/components/LiveToaster';
 import { api } from '@/lib/api';
+import { downloadCSV } from '@/lib/csv';
 
 const STATUS_LABEL: Record<string, string> = {
   PENDIENTE: 'Pendiente',
@@ -38,10 +39,14 @@ export default function TareasPage() {
   return (
     <AppShell>
       <LiveToaster />
-      <div style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>Tareas</h2>
-        <p style={{ color: 'var(--muted)', fontSize: '0.85rem', margin: '4px 0 0' }}>Clic en el estado para avanzarla</p>
-      </div>
+
+<div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+  <div>
+    <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>Tareas</h2>
+    <p style={{ color: 'var(--muted)', fontSize: '0.85rem', margin: '4px 0 0' }}>Clic en el estado para avanzarla</p>
+  </div>
+  <button className="btn ghost" onClick={() => downloadCSV('tareas.csv', tasks.map((t) => ({ Tarea: t.title, Responsable: t.owner?.name || '', Estado: t.status })))}>Exportar CSV</button>
+</div>
 
       <form onSubmit={handleCreate} className="panel" style={{ marginBottom: 20, display: 'flex', gap: 10 }}>
         <input style={{ flex: 1, padding: '9px 10px', border: '1px solid var(--border)' }} placeholder="Nueva tarea…" value={title} onChange={(e) => setTitle(e.target.value)} />

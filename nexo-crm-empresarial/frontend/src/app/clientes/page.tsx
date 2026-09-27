@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import LiveToaster from '@/components/LiveToaster';
 import { api } from '@/lib/api';
+import { downloadCSV } from '@/lib/csv';
 
 const SEGMENT_CLASS: Record<string, string> = {
   VIP: 'badge gold',
@@ -57,6 +58,7 @@ export default function ClientesPage() {
             <button className="btn ghost" type="submit">Buscar</button>
           </form>
           <button className="btn" onClick={() => setShowForm(!showForm)}>+ Nuevo cliente</button>
+                 <button className="btn ghost" onClick={() => downloadCSV('clientes.csv', clients.map((c) => ({ Nombre: c.name, Empresa: c.company, Email: c.email, Telefono: c.phone, Segmento: c.segment })))}>Exportar CSV</button>       
         </div>
       </div>
 

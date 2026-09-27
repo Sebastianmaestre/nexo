@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import LiveToaster from '@/components/LiveToaster';
 import { api } from '@/lib/api';
+import { downloadCSV } from '@/lib/csv';
 
 const STAGES = ['PROSPECTO', 'CONTACTADO', 'PROPUESTA', 'CERRADO_GANADO', 'CERRADO_PERDIDO'];
 const STAGE_LABEL: Record<string, string> = {
@@ -51,7 +52,8 @@ export default function PipelinePage() {
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>Pipeline de ventas</h2>
           <p style={{ color: 'var(--muted)', fontSize: '0.85rem', margin: '4px 0 0' }}>Arrastrá negocios entre etapas cambiando su estado</p>
         </div>
-        <button className="btn" onClick={() => setShowForm(!showForm)}>+ Nuevo negocio</button>
+             <button className="btn ghost" onClick={() => downloadCSV('negocios.csv', Object.values(grouped).flat().map((d: any) => ({ Titulo: d.title, Cliente: d.client.name, Valor: d.value, Etapa: d.stage })))}>Exportar CSV</button>
+          <button className="btn" onClick={() => setShowForm(!showForm)}>+ Nuevo negocio</button>
       </div>
 
       {showForm && (
