@@ -10,6 +10,8 @@ const NAV_BY_ROLE: Record<string, { href: string; label: string }[]> = {
     { href: '/pipeline', label: 'Pipeline' },
     { href: '/reuniones', label: 'Reuniones' },
     { href: '/tareas', label: 'Tareas' },
+    { href: '/auditoria', label: 'Auditoría' },
+
   ],
   VENTAS: [
     { href: '/dashboard', label: 'Dashboard' },

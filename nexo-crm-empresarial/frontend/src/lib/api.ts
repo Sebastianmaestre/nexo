@@ -63,6 +63,9 @@ export const api = {
   dashboard: {
     summary: () => request('/dashboard/summary'),
   },
+    audit: {
+    list: () => request('/audit'),
+  },
 };
 
 export function saveToken(token: string) {
