@@ -11,7 +11,6 @@ const NAV_BY_ROLE: Record<string, { href: string; label: string }[]> = {
     { href: '/reuniones', label: 'Reuniones' },
     { href: '/tareas', label: 'Tareas' },
     { href: '/auditoria', label: 'Auditoría' },
-
   ],
   VENTAS: [
     { href: '/dashboard', label: 'Dashboard' },
@@ -33,14 +32,14 @@ const ROLE_LABEL: Record<string, string> = {
   SOPORTE: 'Soporte',
 };
 
-export default function Sidebar() {
+export default function Sidebar({ open, onNavigate }: { open?: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   if (!user) return null;
   const items = NAV_BY_ROLE[user.role] || [];
 
   return (
-    <aside style={{
+    <aside className={`sidebar ${open ? 'open' : ''}`} style={{
       width: 230, flexShrink: 0, background: 'var(--ink)', color: '#F1F5F3',
       padding: '28px 20px', display: 'flex', flexDirection: 'column', minHeight: '100vh',
     }}>
@@ -53,6 +52,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               style={{
                 display: 'block', padding: '11px 12px', fontSize: '0.92rem',
                 color: active ? '#fff' : '#CBDAD4',
