@@ -42,12 +42,13 @@ export default function TyronWidget() {
         {open ? '×' : '💬'}
       </button>
 
-      {open && (
-        <div style={{
+            {open && (
+        <div className="tyron-widget-panel" style={{
           position: 'fixed', bottom: 90, right: 24, width: 340, maxHeight: 460, background: 'var(--surface)',
           border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', zIndex: 60,
           boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
         }}>
+        
           <div style={{ background: 'var(--ink)', color: '#fff', padding: '12px 16px' }}>
             <strong style={{ fontFamily: 'Lora, serif' }}>Tyron</strong>
             <p style={{ margin: 0, fontSize: '0.75rem', color: '#9AAFA7' }}>Asistente del CRM</p>
